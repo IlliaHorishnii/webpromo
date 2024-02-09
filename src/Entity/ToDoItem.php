@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\ToDoListItemRepository;
+use App\Repository\ToDoItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ToDoListItemRepository::class)]
-class ToDoListItem extends BaseEntity
+#[ORM\Entity(repositoryClass: ToDoItemRepository::class)]
+class ToDoItem extends BaseEntity
 {
     const STATUS_NEW = "NEW";
     const STATUS_VIEWED = "VIEWED";
@@ -23,20 +24,25 @@ class ToDoListItem extends BaseEntity
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?bool $isDone = null;
+    #[Groups(["list"])]
+    private ?bool $isDone = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["list"])]
     private ?string $text = null;
 
     #[ORM\Column]
-    private ?int $viewsCount = null;
+    #[Groups(["list"])]
+    private ?int $viewsCount = 0;
 
     #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    #[Groups(["list"])]
+    private ?string $status = self::STATUS_NEW;
 
-    #[ORM\ManyToOne(inversedBy: 'toDoListItems')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?ToDoList $toDoList = null;
+    #[ORM\ManyToOne(inversedBy: 'toDoItems')]
+    #[Assert\NotBlank]
+    #[Groups(["employee"])]
+    private ?Employee $employee = null;
 
     public function getId(): ?int
     {
@@ -86,7 +92,7 @@ class ToDoListItem extends BaseEntity
     public function setStatus(string $status): static
     {
         if(!in_array($status, self::STATUSES)) {
-            throw new Exception("invalid status", 403);
+            throw new \Exception("invalid status", 403);
         }
 
         $this->status = $status;
@@ -94,14 +100,14 @@ class ToDoListItem extends BaseEntity
         return $this;
     }
 
-    public function getToDoList(): ?ToDoList
+    public function getEmployee(): ?Employee
     {
-        return $this->toDoList;
+        return $this->employee;
     }
 
-    public function setToDoList(?ToDoList $toDoList): static
+    public function setEmployee(?Employee $employee): static
     {
-        $this->toDoList = $toDoList;
+        $this->employee = $employee;
 
         return $this;
     }
