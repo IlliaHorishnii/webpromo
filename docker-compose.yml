@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: webpromo
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    ports:
+      - 3308:3306
+    volumes:
+      - webpromo_mysql:/var/lib/mysql
+
+  php:
+    build:
+      context: ./.provision/php
+    working_dir: /var/www/app
+    volumes:
+      - ./:/var/www/app
+      - ./.provision/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    env_file:
+      - .env
+      - .env.local
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 83:80
+    volumes:
+      - .:/var/www/app:cached
+      - ./.provision/nginx/docker.conf:/etc/nginx/conf.d/default.conf
+    env_file:
+      - .env
+      - .env.local
+
+volumes:
+  webpromo_mysql:
