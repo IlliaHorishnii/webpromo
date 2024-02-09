@@ -11,8 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmployeeRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Employee extends BaseEntity
+class Employee
 {
+    use DatetimeTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -25,7 +26,6 @@ class Employee extends BaseEntity
     private ?string $name = null;
 
     #[ORM\OneToMany(targetEntity: ToDoItem::class, mappedBy: 'employee', orphanRemoval: true)]
-    #[Groups(["list"])]
     private Collection $toDoItems;
 
     public function __construct()
@@ -78,15 +78,5 @@ class Employee extends BaseEntity
         }
 
         return $this;
-    }
-
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function updatedTimestamps(): void
-    {
-        $this->setUpdatedAt(new \DateTime('now'));
-        if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt(new \DateTime('now'));
-        }
     }
 }

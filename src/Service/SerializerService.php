@@ -43,9 +43,6 @@ class SerializerService
     }
 
     /**
-     * @param mixed $object
-     * @param array $context
-     * @return array
      * @throws ExceptionInterface
      */
     public function toArray(mixed $object, array $context = []): array

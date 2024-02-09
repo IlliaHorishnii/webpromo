@@ -6,6 +6,7 @@ use App\Entity\ToDoItem;
 use App\Form\FormHandler;
 use App\Form\ToDoItemType;
 use App\Repository\ToDoItemRepository;
+use App\Service\ToDoItemService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,15 +18,15 @@ use Symfony\Component\Routing\Attribute\Route;
 class ToDoItemController extends BaseController
 {
     #[Route('/list/{employeeId}', name: 'get_to_do_list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(ToDoItemService $toDoItemService): JsonResponse
     {
         $employeeId = $this->request->get('employeeId');
-        $pagination = $this->request->query->get('pagination');
 
         /** @var  ToDoItemRepository $repo */
         $repo = $this->entityManager->getRepository(ToDoItem::class);
-        $toDoList = $repo->getListByEmployee($employeeId, $pagination);
+        $toDoList = $repo->getListByEmployee($employeeId,  $this->request->query->all());
 
+        $toDoList = $toDoItemService->increaseViewCounter($toDoList);
         return $this->response($toDoList, ['groups' => ['list', 'employee']]);
     }
 
@@ -40,7 +41,7 @@ class ToDoItemController extends BaseController
         return $this->json(['message' => 'ok']);
     }
 
-    #[Route('/update-text/{itemId}', name: 'update_item_text', methods: ['POST'])]
+    #[Route('/update-text/{itemId}', name: 'update_item_text', methods: ['PUT'])]
     public function updateItemText(): JsonResponse
     {
         $itemId = $this->request->get('itemId');
@@ -50,7 +51,11 @@ class ToDoItemController extends BaseController
             ], 404);
         }
 
-        $toDoItem->setText($this->request->get('text'));
+        $data = $this->request->toArray();
+
+        $text = $data['text'] ?? '';
+        $toDoItem->setText($text);
+
         $this->entityManager->flush();
 
         return $this->json(['message' => 'ok']);
@@ -59,7 +64,7 @@ class ToDoItemController extends BaseController
     /**
      * @throws \Exception
      */
-    #[Route('/mark-as-done/{itemId}', name: 'mark_item_as_done', methods: ['POST'])]
+    #[Route('/mark-as-done/{itemId}', name: 'mark_item_as_done', methods: ['PUT'])]
     public function markAsDone(): JsonResponse
     {
         $itemId = $this->request->get('itemId');

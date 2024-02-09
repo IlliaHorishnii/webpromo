@@ -7,16 +7,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class FormHandler
 {
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var FormFactoryInterface */
-    private $formFactory;
-
-    public function __construct(EntityManagerInterface $em, FormFactoryInterface $formFactory)
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly FormFactoryInterface   $formFactory
+    )
     {
-        $this->em = $em;
-        $this->formFactory = $formFactory;
     }
 
     /**

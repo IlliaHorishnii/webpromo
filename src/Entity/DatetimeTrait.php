@@ -6,8 +6,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\HasLifecycleCallbacks]
-class BaseEntity
+trait DatetimeTrait
 {
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["list"])]
@@ -16,7 +15,6 @@ class BaseEntity
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["list"])]
     private ?\DateTimeInterface $updatedAt = null;
-
     public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;

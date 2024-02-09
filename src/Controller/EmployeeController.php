@@ -15,11 +15,9 @@ class EmployeeController extends BaseController
     #[Route('', name: 'get_employee_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
-        $pagination = $this->request->query->get('pagination');
-
         /** @var  EmployeeRepository $repo */
         $repo = $this->entityManager->getRepository(Employee::class);
-        $employees = $repo->getList($pagination);
+        $employees = $repo->getList($this->request->query->all());
 
         return $this->response($employees, ['groups' => ['list']]);
     }
@@ -32,7 +30,7 @@ class EmployeeController extends BaseController
         } catch (\Exception $e) {
             return new JsonResponse([
                 'message' => $e->getMessage()
-            ], $e->getCode());
+            ], $e->getCode() ?: 422);
         }
 
         return $this->json(['message' => 'ok']);

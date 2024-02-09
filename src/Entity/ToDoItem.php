@@ -9,8 +9,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ToDoItemRepository::class)]
-class ToDoItem extends BaseEntity
+#[ORM\HasLifecycleCallbacks]
+class ToDoItem
 {
+    use DatetimeTrait;
     const STATUS_NEW = "NEW";
     const STATUS_VIEWED = "VIEWED";
     const STATUS_IMPORTANT = "IMPORTANT";
@@ -21,6 +23,7 @@ class ToDoItem extends BaseEntity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["list"])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -41,7 +44,7 @@ class ToDoItem extends BaseEntity
 
     #[ORM\ManyToOne(inversedBy: 'toDoItems')]
     #[Assert\NotBlank]
-    #[Groups(["employee"])]
+    #[Groups(["list"])]
     private ?Employee $employee = null;
 
     public function getId(): ?int
