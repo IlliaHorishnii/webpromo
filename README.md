@@ -19,4 +19,4 @@ $ docker-compose exec php composer install
 
 ## API Documentation
 
-You can view the Swagger API documentation at http://localhost:83/api/doc
+You can view the documentation at Postman by link: https://www.postman.com/aviation-cosmonaut-37362935/workspace/devo-test-api/request/32327753-652252b2-8a6f-44a5-bc25-9ecdcf7ac2f9
